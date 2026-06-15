@@ -1,0 +1,9 @@
+CREATE TABLE devices (
+    id UUID PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    serial VARCHAR(100) UNIQUE NOT NULL,
+    token_hash TEXT NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    last_seen TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
