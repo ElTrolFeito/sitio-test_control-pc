@@ -86,12 +86,12 @@ export default function Dashboard() {
     <Layout>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Devices */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700">
             <div className="flex items-center gap-2">
               <Server className="w-5 h-5 text-primary-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Dispositivos</h2>
-              <span className="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{devices.length}</span>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Dispositivos</h2>
+              <span className="text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">{devices.length}</span>
             </div>
             <button
               onClick={() => setShowDeviceForm(true)}
@@ -101,26 +101,26 @@ export default function Dashboard() {
               Agregar
             </button>
           </div>
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-700">
             {devices.length === 0 ? (
-              <div className="px-6 py-10 text-center text-slate-400 text-sm">
-                <Cpu className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+              <div className="px-6 py-10 text-center text-slate-400 dark:text-slate-500 text-sm">
+                <Cpu className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
                 No hay dispositivos registrados
               </div>
             ) : (
               devices.map(d => (
                 <div key={d.id} className="px-6 py-4 flex items-center justify-between group">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center">
-                      <Cpu className="w-5 h-5 text-slate-500" />
+                    <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-700 flex items-center justify-center">
+                      <Cpu className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-900">{d.name}</p>
-                      <p className="text-xs text-slate-500">{d.serial}</p>
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{d.name}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{d.serial}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${d.enabled ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${d.enabled ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'}`}>
                       {d.enabled ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
                       {d.enabled ? 'Activo' : 'Inactivo'}
                     </span>
@@ -132,12 +132,12 @@ export default function Dashboard() {
         </div>
 
         {/* PCs */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700">
             <div className="flex items-center gap-2">
               <Monitor className="w-5 h-5 text-primary-600" />
-              <h2 className="text-lg font-semibold text-slate-900">PCs Administrados</h2>
-              <span className="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{pcs.length}</span>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">PCs Administrados</h2>
+              <span className="text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">{pcs.length}</span>
             </div>
             <button
               onClick={() => setShowPcForm(true)}
@@ -147,24 +147,24 @@ export default function Dashboard() {
               Agregar
             </button>
           </div>
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-700">
             {pcs.length === 0 ? (
-              <div className="px-6 py-10 text-center text-slate-400 text-sm">
-                <Monitor className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+              <div className="px-6 py-10 text-center text-slate-400 dark:text-slate-500 text-sm">
+                <Monitor className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
                 No hay PCs registrados
               </div>
             ) : (
               pcs.map(pc => (
                 <div key={pc.id} className="px-6 py-4 flex items-center justify-between group">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
-                      <Monitor className="w-5 h-5 text-slate-500" />
+                    <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                      <Monitor className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-900 truncate">{pc.name}</p>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{pc.name}</p>
+                      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                         <span className="font-mono">{pc.macAddress}</span>
-                        <span className="text-slate-300">|</span>
+                        <span className="text-slate-300 dark:text-slate-600">|</span>
                         <span className="font-mono">{pc.broadcastIp}</span>
                       </div>
                     </div>
@@ -187,36 +187,36 @@ export default function Dashboard() {
       {/* Add Device Modal */}
       {showDeviceForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-semibold text-slate-900">Registrar Dispositivo</h3>
-              <button onClick={() => setShowDeviceForm(false)} className="text-slate-400 hover:text-slate-600">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Registrar Dispositivo</h3>
+              <button onClick={() => setShowDeviceForm(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handleAddDevice} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nombre</label>
                 <input
                   type="text"
                   value={deviceForm.name}
                   onChange={e => setDeviceForm({ ...deviceForm, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Raspberry Pi Living Room"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Serial</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Serial</label>
                 <input
                   type="text"
                   value={deviceForm.serial}
                   onChange={e => setDeviceForm({ ...deviceForm, serial: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="RPi-001"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setShowDeviceForm(false)} className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+                <button type="button" onClick={() => setShowDeviceForm(false)} className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                   Cancelar
                 </button>
                 <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
@@ -231,20 +231,20 @@ export default function Dashboard() {
       {/* Add PC Modal */}
       {showPcForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-semibold text-slate-900">Agregar PC</h3>
-              <button onClick={() => setShowPcForm(false)} className="text-slate-400 hover:text-slate-600">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Agregar PC</h3>
+              <button onClick={() => setShowPcForm(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handleAddPc} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Dispositivo</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Dispositivo</label>
                 <select
                   value={pcForm.deviceId}
                   onChange={e => setPcForm({ ...pcForm, deviceId: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="">Seleccionar dispositivo...</option>
                   {devices.map(d => (
@@ -253,40 +253,40 @@ export default function Dashboard() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nombre</label>
                 <input
                   type="text"
                   value={pcForm.name}
                   onChange={e => setPcForm({ ...pcForm, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="PC Oficina"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Direccion MAC</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Direccion MAC</label>
                 <input
                   type="text"
                   value={pcForm.macAddress}
                   onChange={e => setPcForm({ ...pcForm, macAddress: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono"
                   placeholder="00:11:22:33:44:55"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">IP Broadcast</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">IP Broadcast</label>
                 <div className="relative">
-                  <Wifi className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Wifi className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input
                     type="text"
                     value={pcForm.broadcastIp}
                     onChange={e => setPcForm({ ...pcForm, broadcastIp: e.target.value })}
-                    className="w-full pl-10 pr-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono"
+                    className="w-full pl-10 pr-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono"
                     placeholder="192.168.1.255"
                   />
                 </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setShowPcForm(false)} className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+                <button type="button" onClick={() => setShowPcForm(false)} className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                   Cancelar
                 </button>
                 <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">

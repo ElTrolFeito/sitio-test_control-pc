@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
 import { login } from '../api/client.js'
-import { Power, Eye, EyeOff } from 'lucide-react'
+import { Power, Eye, EyeOff, Sun, Moon } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function Login() {
@@ -11,6 +12,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const { login: doLogin } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
   async function handleSubmit(e) {
@@ -33,44 +35,44 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-8">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-primary-50 dark:bg-primary-900/30 rounded-2xl flex items-center justify-center mb-4">
               <Power className="w-8 h-8 text-primary-600" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">SitioPC</h1>
-            <p className="text-sm text-slate-500 mt-1">Wake On LAN Management</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">SitioPC</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Wake On LAN Management</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Usuario</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Usuario</label>
               <input
                 type="text"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                 placeholder="admin"
                 autoComplete="username"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Contrasena</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Contrasena</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors pr-12"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors pr-12"
                   placeholder="••••••••"
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -84,6 +86,16 @@ export default function Login() {
               {loading ? 'Iniciando...' : 'Iniciar sesion'}
             </button>
           </form>
+        </div>
+
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={toggleTheme}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            {theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+          </button>
         </div>
       </div>
     </div>
