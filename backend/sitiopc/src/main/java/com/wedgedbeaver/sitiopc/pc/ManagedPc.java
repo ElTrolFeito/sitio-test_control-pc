@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wedgedbeaver.sitiopc.device.Device;
 
 @Getter
@@ -20,7 +21,11 @@ public class ManagedPc {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "device_id")
+    @JsonIgnore
     private Device device;
+
+    @Column(name = "device_id", insertable = false, updatable = false)
+    private UUID deviceId;
 
     @Column(nullable = false)
     private String name;

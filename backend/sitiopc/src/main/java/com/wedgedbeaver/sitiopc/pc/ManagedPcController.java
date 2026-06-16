@@ -12,8 +12,6 @@ import com.wedgedbeaver.sitiopc.device.DeviceRepository;
 import com.wedgedbeaver.sitiopc.user.User;
 import com.wedgedbeaver.sitiopc.user.UserRepository;
 
-//import jakarta.servlet.http.HttpServletRequest;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +36,12 @@ public class ManagedPcController {
 
     @GetMapping
     public ResponseEntity<List<ManagedPc>> listPcs() {
-        return ResponseEntity.ok(managedPcRepository.findAll());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Usuario no encontrado"));
+        return ResponseEntity.ok(managedPcRepository.findByDevice_User(user));
     }
 
     @GetMapping("/device/{deviceId}")
@@ -46,11 +49,6 @@ public class ManagedPcController {
             @PathVariable UUID deviceId) {
         return ResponseEntity.ok(
                 managedPcRepository.findByDeviceId(deviceId));
-    }
-
-    @PostMapping("/test")
-    public ResponseEntity<String> test(@RequestBody String body) {
-        return ResponseEntity.ok(body);
     }
 
     @PostMapping(consumes = "application/json")
@@ -61,8 +59,8 @@ public class ManagedPcController {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "El dispositivo no existe"));
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
         User user = userRepository.findByUsername(username)
@@ -72,46 +70,21 @@ public class ManagedPcController {
 
         if (existingDevice.getUser() == null ||
                 !existingDevice.getUser().getId().equals(user.getId())) {
-            System.out.println("No tienes permisos para utilizar este dispositivo");
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "No tienes permisos para utilizar este dispositivo");
         }
 
         ManagedPc pc = new ManagedPc();
-
         pc.setId(UUID.randomUUID());
         pc.setDevice(existingDevice);
         pc.setName(request.getName());
         pc.setMacAddress(request.getMacAddress());
         pc.setBroadcastIp(request.getBroadcastIp());
-
         pc.setEnabled(true);
         pc.setCreatedAt(LocalDateTime.now());
 
-        System.out.println("ANTES DEL SAVE");
-
-        return ResponseEntity.ok(pc);
+        ManagedPc saved = managedPcRepository.save(pc);
+        return ResponseEntity.ok(saved);
     }
-
-    @PostMapping("/debug")
-    public ResponseEntity<String> debug(
-            @RequestBody CreatePcRequest request) {
-
-        return ResponseEntity.ok(
-                "DeviceId=" + request.getDeviceId()
-                        + ", Name=" + request.getName()
-                        + ", MAC=" + request.getMacAddress()
-                        + ", Broadcast=" + request.getBroadcastIp());
-    }
-
-    @PostMapping("/real")
-    public ResponseEntity<ManagedPc> createPcReal(
-            @RequestBody CreatePcRequest request) {
-
-        System.out.println("ENTRO A REAL");
-
-        return ResponseEntity.ok(new ManagedPc());
-    }
-
 }

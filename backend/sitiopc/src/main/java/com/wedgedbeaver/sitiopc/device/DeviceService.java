@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
 
+import com.wedgedbeaver.sitiopc.user.User;
+
 @Service
 public class DeviceService {
 
@@ -20,11 +22,11 @@ public class DeviceService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<Device> findAll() {
-        return repository.findAll();
+    public List<Device> findByUser(User user) {
+        return repository.findByUser(user);
     }
 
-    public RegisterDeviceResponse register(RegisterDeviceRequest request) {
+    public RegisterDeviceResponse register(RegisterDeviceRequest request, User user) {
 
         Optional<Device> existing =
                 repository.findBySerial(request.getSerial());
@@ -52,6 +54,7 @@ public class DeviceService {
         device.setEnabled(true);
         device.setCreatedAt(LocalDateTime.now());
         device.setLastSeen(null);
+        device.setUser(user);
 
         repository.save(device);
 

@@ -8,4 +8,5 @@ import com.wedgedbeaver.sitiopc.user.User;
 public interface DeviceRepository extends JpaRepository<Device, UUID> {
     Optional<Device> findBySerial(String serial);
     Optional<Device> findByIdAndUser(UUID id, User user);
+    List<Device> findByUser(User user);
 }

@@ -3,6 +3,7 @@ package com.wedgedbeaver.sitiopc.device;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wedgedbeaver.sitiopc.user.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class Device {
     private String serial;
 
     @Column(name = "token_hash", nullable = false)
+    @JsonIgnore
     private String tokenHash;
 
     @Column(nullable = false)
@@ -36,5 +38,6 @@ public class Device {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 }
