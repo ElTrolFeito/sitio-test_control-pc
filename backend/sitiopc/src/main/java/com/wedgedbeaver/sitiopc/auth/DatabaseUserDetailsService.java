@@ -21,10 +21,11 @@ public class DatabaseUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow();
 
+        String authority = user.getRole() != null ? "ROLE_" + user.getRole() : "ROLE_USER";
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPasswordHash())
-                .authorities("ROLE_USER")
+                .authorities(authority)
                 .build();
     }
 }

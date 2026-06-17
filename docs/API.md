@@ -28,9 +28,12 @@ Authenticate a user and receive a JWT token.
 ```json
 {
   "token": "jwt-token",
-  "user": "username"
+  "user": "username",
+  "role": "USER"
 }
 ```
+
+---
 
 ---
 
@@ -146,8 +149,59 @@ Mark a command as completed (used by the IoT device).
 
 ---
 
+### Admin Endpoints
+
+All admin endpoints require `ADMIN` role. The JWT token must contain the `ROLE_ADMIN` authority.
+
+#### GET /admin/users
+
+List all users. Returns username, role, and enabled status only (no password hashes).
+
+#### POST /admin/users
+
+Create a new user (can be regular USER or ADMIN).
+
+**Request Body:**
+```json
+{
+  "username": "string",
+  "password": "string",
+  "role": "USER"
+}
+```
+
+#### GET /admin/devices
+
+List all devices across all users with owner information.
+
+#### DELETE /admin/devices/{id}
+
+Delete any device (and its associated PCs via cascade).
+
+#### GET /admin/pcs
+
+List all PCs across all users with owner and device information.
+
+#### DELETE /admin/pcs/{id}
+
+Delete any PC.
+
+#### POST /admin/commands/wake
+
+Send a Wake On LAN command to any PC regardless of ownership.
+
+**Request Body:**
+```json
+{
+  "managedPcId": "uuid"
+}
+```
+
+---
+
 ## Security Notes
 
 - All endpoints that modify or return user-specific data enforce ownership checks via JWT token
 - Devices are linked to users — devices or PCs cannot be accessed by another user
 - The device token returned on registration is used by the IoT device for authentication
+- Admin endpoints are protected by `@PreAuthorize("hasRole('ADMIN')")` and return 403 for non-admin users

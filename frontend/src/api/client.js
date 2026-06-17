@@ -71,3 +71,38 @@ export async function sendWakeCommand(managedPcId) {
     body: JSON.stringify({ managedPcId })
   })
 }
+
+// Admin endpoints
+export async function getAdminUsers() {
+  return api('/admin/users')
+}
+
+export async function createUser(userData) {
+  return api('/admin/users', {
+    method: 'POST',
+    body: JSON.stringify(userData)
+  })
+}
+
+export async function getAdminDevices() {
+  return api('/admin/devices')
+}
+
+export async function deleteDevice(id) {
+  return api(`/admin/devices/${id}`, { method: 'DELETE' })
+}
+
+export async function getAdminPcs() {
+  return api('/admin/pcs')
+}
+
+export async function deletePc(id) {
+  return api(`/admin/pcs/${id}`, { method: 'DELETE' })
+}
+
+export async function adminSendWakeCommand(managedPcId) {
+  return api('/admin/commands/wake', {
+    method: 'POST',
+    body: JSON.stringify({ managedPcId })
+  })
+}

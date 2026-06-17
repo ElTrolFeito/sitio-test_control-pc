@@ -24,7 +24,7 @@ export default function Login() {
     setLoading(true)
     try {
       const data = await login(username, password)
-      doLogin(data.token, data.user)
+      doLogin(data.token, data.user, data.role)
       toast.success('Bienvenido!')
       navigate('/')
     } catch (err) {

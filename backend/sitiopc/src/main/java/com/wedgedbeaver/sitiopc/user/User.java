@@ -25,5 +25,8 @@ public class User {
     @Column(nullable = false)
     private Boolean enabled;
 
+    @Column(nullable = false, length = 50)
+    private String role = "USER";
+
     // Getters y setters
 }
