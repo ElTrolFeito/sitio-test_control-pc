@@ -21,13 +21,20 @@ class ApiClient:
             self.token = data.get("token")
             self.device_id = data.get("device_id")
 
-    def _save_config(self):
+    def _save_config(self, extra=None):
         ensure_config_dir()
-        data = {
-            "token": self.token,
-            "device_id": self.device_id,
-            "base_url": self.base_url,
-        }
+        # Read existing config so we don't overwrite keys we don't own (e.g. username/password)
+        data = {}
+        if CONFIG_FILE.exists():
+            try:
+                data = json.loads(CONFIG_FILE.read_text())
+            except (json.JSONDecodeError, OSError):
+                pass
+        data["token"] = self.token
+        data["device_id"] = self.device_id
+        data["base_url"] = self.base_url
+        if extra:
+            data.update(extra)
         CONFIG_FILE.write_text(json.dumps(data, indent=2))
 
     def _request(self, method, path, json_data=None, auth=True):
@@ -65,7 +72,6 @@ class ApiClient:
             return data
         print(f"[ERROR] Device registration failed: {resp.status_code} {resp.text}")
         return None
-
     def get_pending_commands(self):
         if not self.device_id:
             print("[ERROR] No device_id configured.")

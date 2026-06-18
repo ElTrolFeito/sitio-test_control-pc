@@ -7,7 +7,7 @@ import ThemeSettings from './ThemeSettings.jsx'
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
-  const { theme, customThemeEnabled, primaryColor, toggleTheme } = useTheme()
+  const { customThemeEnabled, rainbowMode, primaryColor } = useTheme()
   const navigate = useNavigate()
   const [showThemeSettings, setShowThemeSettings] = useState(false)
 
@@ -29,19 +29,24 @@ export default function Layout({ children }) {
               <span className="text-sm text-slate-600 dark:text-slate-400 hidden sm:inline">{user}</span>
               <button
                 onClick={() => setShowThemeSettings(true)}
-                className={`inline-flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${customThemeEnabled
-                    ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/50'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                  }`}
+                className="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
                 title="Personalizar tema"
               >
-                {customThemeEnabled ? (
+                {rainbowMode ? (
+                  <div
+                    className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                    style={{
+                      background: `conic-gradient(from 0deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)`,
+                      backgroundColor: primaryColor
+                    }}
+                  />
+                ) : customThemeEnabled ? (
                   <div
                     className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
                     style={{ backgroundColor: primaryColor }}
                   />
                 ) : (
-                  <Palette className="w-4 h-4" />
+                  <Palette className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                 )}
               </button>
               <button

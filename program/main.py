@@ -40,7 +40,6 @@ def setup_device(api):
         return False
     print("[OK] Logged in successfully.")
 
-    cfg = load_or_create_config()
     device_name = input("Device name (e.g., 'Raspberry Pi Zero W'): ").strip() or "SitioPC Agent"
     serial = input("Device serial (leave blank for auto-generated): ").strip()
     if not serial:
@@ -50,12 +49,14 @@ def setup_device(api):
     result = api.register_device(device_name, serial)
     if result:
         print(f"[OK] Device registered. ID: {result.get('deviceId')}")
-        cfg["username"] = username
-        cfg["password"] = password
-        cfg["device_name"] = device_name
-        cfg["serial"] = serial
-        cfg["base_url"] = api.base_url
-        save_config(cfg)
+        # Persist all setup data — use _save_config with extra so it merges
+        # with the token/device_id already written by login+register_device.
+        api._save_config(extra={
+            "username": username,
+            "password": password,
+            "device_name": device_name,
+            "serial": serial,
+        })
         return True
     return False
 

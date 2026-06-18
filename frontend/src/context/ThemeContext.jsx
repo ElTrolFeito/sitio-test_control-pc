@@ -1,8 +1,10 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react'
 import {
   generateColorPalette,
   generateDarkPalette,
   generateThemeCSS,
+  hslToRgb,
+  rgbToHex,
   DEFAULT_PRIMARY
 } from '../utils/colors'
 
@@ -13,14 +15,12 @@ const STYLE_TAG_ID = 'custom-theme-overrides'
 function applyThemeStyles(themeMode, primaryColor, customEnabled) {
   const root = document.documentElement
 
-  // Dark mode class
   if (themeMode === 'dark') {
     root.classList.add('dark')
   } else {
     root.classList.remove('dark')
   }
 
-  // Remove previous overrides
   const existing = document.getElementById(STYLE_TAG_ID)
   if (existing) existing.remove()
 
@@ -29,11 +29,9 @@ function applyThemeStyles(themeMode, primaryColor, customEnabled) {
   const lightPalette = generateColorPalette(primaryColor)
   if (!lightPalette) return
 
-  // Dark palette is always derived from light regardless of current mode.
-  // The CSS selectors handle which version applies per mode.
   const darkPalette = generateDarkPalette(lightPalette)
-
   const css = generateThemeCSS(lightPalette, darkPalette)
+
   const styleEl = document.createElement('style')
   styleEl.id = STYLE_TAG_ID
   styleEl.textContent = css
@@ -55,11 +53,61 @@ export function ThemeProvider({ children }) {
     return localStorage.getItem('customThemeEnabled') === 'true'
   })
 
-  // Apply theme whenever any of the three values change
+  const [rainbowMode, setRainbowMode] = useState(() => {
+    return localStorage.getItem('rainbowMode') === 'true'
+  })
+
+  const rainbowRef = useRef(null)
+  const rainbowHueRef = useRef(0)
+
+  // Stop any running rainbow animation
+  const stopRainbow = useCallback(() => {
+    if (rainbowRef.current) {
+      clearInterval(rainbowRef.current)
+      rainbowRef.current = null
+    }
+  }, [])
+
+  // Start rainbow animation — cycles hue at ~20fps
+  const startRainbow = useCallback((currentTheme, currentCustom) => {
+    stopRainbow()
+    rainbowRef.current = setInterval(() => {
+      rainbowHueRef.current = (rainbowHueRef.current + 1.2) % 360
+      const h = rainbowHueRef.current
+      const [r, g, b] = hslToRgb(h, 90, 50)
+      const hex = rgbToHex(r, g, b)
+      setPrimaryColor(hex)
+      // Directly apply styles without going through the effect cycle for smooth animation
+      applyThemeStyles(currentTheme, hex, true)
+    }, 50)
+  }, [stopRainbow])
+
+  // Apply theme whenever mode, color, or custom-enabled changes
   useEffect(() => {
-    applyThemeStyles(theme, primaryColor, customThemeEnabled)
+    if (!rainbowMode) {
+      applyThemeStyles(theme, primaryColor, customThemeEnabled)
+    }
     localStorage.setItem('theme', theme)
-  }, [theme, primaryColor, customThemeEnabled])
+  }, [theme, primaryColor, customThemeEnabled, rainbowMode])
+
+  // Manage rainbow lifecycle
+  useEffect(() => {
+    localStorage.setItem('rainbowMode', rainbowMode ? 'true' : 'false')
+    if (rainbowMode) {
+      startRainbow(theme, customThemeEnabled)
+    } else {
+      stopRainbow()
+      applyThemeStyles(theme, primaryColor, customThemeEnabled)
+    }
+    return () => stopRainbow()
+  }, [rainbowMode]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // When theme mode changes while rainbow is running, restart so the closure has the new mode
+  useEffect(() => {
+    if (rainbowMode) {
+      startRainbow(theme, customThemeEnabled)
+    }
+  }, [theme]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     localStorage.setItem('primaryColor', primaryColor)
@@ -83,6 +131,16 @@ export function ThemeProvider({ children }) {
 
   function enableCustomTheme(enabled) {
     setCustomThemeEnabled(enabled)
+    if (!enabled && rainbowMode) {
+      setRainbowMode(false)
+    }
+  }
+
+  function enableRainbow(enabled) {
+    if (enabled && !customThemeEnabled) {
+      setCustomThemeEnabled(true)
+    }
+    setRainbowMode(enabled)
   }
 
   return (
@@ -90,10 +148,12 @@ export function ThemeProvider({ children }) {
       theme,
       primaryColor,
       customThemeEnabled,
+      rainbowMode,
       toggleTheme,
       setThemeMode,
       updatePrimaryColor,
-      enableCustomTheme
+      enableCustomTheme,
+      enableRainbow
     }}>
       {children}
     </ThemeContext.Provider>

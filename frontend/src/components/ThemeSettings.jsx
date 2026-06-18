@@ -8,9 +8,11 @@ export default function ThemeSettings({ onClose }) {
     theme,
     primaryColor,
     customThemeEnabled,
+    rainbowMode,
     setThemeMode,
     updatePrimaryColor,
-    enableCustomTheme
+    enableCustomTheme,
+    enableRainbow
   } = useTheme()
 
   const lightPalette = generateColorPalette(primaryColor) || {}
@@ -79,6 +81,11 @@ export default function ThemeSettings({ onClose }) {
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Color Personalizado
+              {rainbowMode && (
+                <span className="ml-2 text-xs font-normal" style={{ background: 'linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  Rainbow activo
+                </span>
+              )}
             </label>
             <button
               onClick={() => enableCustomTheme(!customThemeEnabled)}
