@@ -1,4 +1,3 @@
-// Convert HSL to RGB
 export function hslToRgb(h, s, l) {
   s /= 100
   l /= 100
@@ -8,13 +7,11 @@ export function hslToRgb(h, s, l) {
   return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)]
 }
 
-// Convert RGB to HSL
 export function rgbToHsl(r, g, b) {
-  r /= 255
-  g /= 255
-  b /= 255
+  r /= 255; g /= 255; b /= 255
   const max = Math.max(r, g, b), min = Math.min(r, g, b)
-  let h, s, l = (max + min) / 2
+  let h, s
+  const l = (max + min) / 2
 
   if (max === min) {
     h = s = 0
@@ -30,7 +27,6 @@ export function rgbToHsl(r, g, b) {
   return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)]
 }
 
-// Convert hex to RGB
 export function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
   return result ? {
@@ -40,81 +36,119 @@ export function hexToRgb(hex) {
   } : null
 }
 
-// Convert RGB to hex
 export function rgbToHex(r, g, b) {
   return '#' + [r, g, b].map(x => {
-    const hex = x.toString(16)
+    const hex = Math.max(0, Math.min(255, Math.round(x))).toString(16)
     return hex.length === 1 ? '0' + hex : hex
   }).join('')
 }
 
-// Generate a full color palette from a base color (hex)
+// Generate full 10-shade palette from a base hex color
+// Shades follow Tailwind's lightness ladder: 50 (lightest) → 900 (darkest)
 export function generateColorPalette(baseHex) {
   const rgb = hexToRgb(baseHex)
   if (!rgb) return null
+  const [h, s] = rgbToHsl(rgb.r, rgb.g, rgb.b)
 
-  const [h, s, l] = rgbToHsl(rgb.r, rgb.g, rgb.b)
+  // Fixed lightness targets matching Tailwind's blue palette
+  const lightnessMap = {
+    50: 97, 100: 93, 200: 86, 300: 75,
+    400: 64, 500: 53, 600: 43, 700: 34,
+    800: 25, 900: 17
+  }
 
   const palette = {}
-  const stops = [
-    [50, 95],
-    [100, 90],
-    [200, 80],
-    [300, 70],
-    [400, 60],
-    [500, 50],
-    [600, 40],
-    [700, 30],
-    [800, 20],
-    [900, 10]
-  ]
-
-  stops.forEach(([shade, lightness]) => {
-    const adjustedL = Math.min(95, Math.max(5, l + (lightness - 50) * 0.9))
-    const adjustedS = shade < 400 ? Math.max(50, s - 10) : Math.min(100, s + 5)
-    const [r, g, b] = hslToRgb(h, adjustedS, adjustedL)
-    palette[shade] = rgbToHex(r, g, b)
+  Object.entries(lightnessMap).forEach(([shade, targetL]) => {
+    // Keep saturation high; slightly reduce for lightest shades
+    const adjustedS = Number(shade) < 300 ? Math.max(40, s * 0.7) : Math.min(100, s * 1.05)
+    const [r, g, b] = hslToRgb(h, adjustedS, targetL)
+    palette[Number(shade)] = rgbToHex(r, g, b)
   })
 
   return palette
 }
 
-// Generate dark theme colors from a palette
+// Generate dark-mode palette — inverts lightness so darks become lights
 export function generateDarkPalette(lightPalette) {
-  const darkPalette = {}
-  darkPalette[50] = lightPalette[900]
-  darkPalette[100] = lightPalette[800]
-  darkPalette[200] = lightPalette[700]
-  darkPalette[300] = lightPalette[600]
-  darkPalette[400] = lightPalette[500]
-  darkPalette[500] = lightPalette[400]
-  darkPalette[600] = lightPalette[300]
-  darkPalette[700] = lightPalette[200]
-  darkPalette[800] = lightPalette[100]
-  darkPalette[900] = lightPalette[50]
-  return darkPalette
+  return {
+    50:  lightPalette[900],
+    100: lightPalette[800],
+    200: lightPalette[700],
+    300: lightPalette[600],
+    400: lightPalette[500],
+    500: lightPalette[400],
+    600: lightPalette[300],
+    700: lightPalette[200],
+    800: lightPalette[100],
+    900: lightPalette[50],
+  }
 }
 
-// Generate CSS variables from palette
-export function paletteToCSSVars(palette, prefix = '--primary') {
-  const vars = {}
-  Object.entries(palette).forEach(([shade, color]) => {
-    vars[`${prefix}-${shade}`] = color
+// Build CSS that overrides ALL Tailwind primary-color utilities.
+// Uses the exact selector format Tailwind v3 emits with darkMode: 'class'.
+export function generateThemeCSS(lightPalette, darkPalette) {
+  const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]
+  const parts = []
+
+  shades.forEach(n => {
+    const lc = lightPalette[n]
+    const dc = darkPalette[n]
+
+    // ── background ──────────────────────────────────────────────
+    parts.push(`.bg-primary-${n}{background-color:${lc}!important}`)
+    parts.push(`.hover\\:bg-primary-${n}:hover{background-color:${lc}!important}`)
+    parts.push(`.dark\\:bg-primary-${n}:is(.dark *){background-color:${dc}!important}`)
+    parts.push(`.dark\\:hover\\:bg-primary-${n}:is(.dark *):hover{background-color:${dc}!important}`)
+
+    // ── text ─────────────────────────────────────────────────────
+    parts.push(`.text-primary-${n}{color:${lc}!important}`)
+    parts.push(`.hover\\:text-primary-${n}:hover{color:${lc}!important}`)
+    parts.push(`.dark\\:text-primary-${n}:is(.dark *){color:${dc}!important}`)
+
+    // ── border ───────────────────────────────────────────────────
+    parts.push(`.border-primary-${n}{border-color:${lc}!important}`)
+    parts.push(`.border-t-primary-${n}{border-top-color:${lc}!important}`)
+    parts.push(`.dark\\:border-primary-${n}:is(.dark *){border-color:${dc}!important}`)
+    parts.push(`.focus\\:border-primary-${n}:focus{border-color:${lc}!important}`)
+
+    // ── ring ─────────────────────────────────────────────────────
+    parts.push(`.ring-primary-${n}{--tw-ring-color:${lc}!important}`)
+    parts.push(`.focus\\:ring-primary-${n}:focus{--tw-ring-color:${lc}!important}`)
   })
-  return vars
+
+  // opacity variants used in the codebase (bg-primary-900/30, /50, /20)
+  const opacityVariants = [
+    [900, 20, '20'], [900, 30, '30'], [900, 50, '50'],
+    [50, 20, '20'],
+  ]
+  opacityVariants.forEach(([shade, pct, suffix]) => {
+    const lc = lightPalette[shade]
+    const dc = darkPalette[shade]
+    const lalpha = pct / 100
+    const lcRgb = hexToRgb(lc)
+    const dcRgb = hexToRgb(dc)
+    if (lcRgb && dcRgb) {
+      const lcRgba = `rgba(${lcRgb.r},${lcRgb.g},${lcRgb.b},${lalpha})`
+      const dcRgba = `rgba(${dcRgb.r},${dcRgb.g},${dcRgb.b},${lalpha})`
+      parts.push(`.bg-primary-${shade}\\/${suffix}{background-color:${lcRgba}!important}`)
+      parts.push(`.dark\\:bg-primary-${shade}\\/${suffix}:is(.dark *){background-color:${dcRgba}!important}`)
+      parts.push(`.hover\\:bg-primary-${shade}\\/${suffix}:hover{background-color:${lcRgba}!important}`)
+      parts.push(`.dark\\:hover\\:bg-primary-${shade}\\/${suffix}:is(.dark *):hover{background-color:${dcRgba}!important}`)
+    }
+  })
+
+  return parts.join('\n')
 }
 
-// Default blue color
 export const DEFAULT_PRIMARY = '#2563eb'
 
-// Preset colors for quick selection
 export const PRESET_COLORS = [
-  { name: 'Blue', hex: '#2563eb' },
+  { name: 'Blue',    hex: '#2563eb' },
   { name: 'Emerald', hex: '#059669' },
-  { name: 'Violet', hex: '#7c3aed' },
-  { name: 'Rose', hex: '#e11d48' },
-  { name: 'Amber', hex: '#d97706' },
-  { name: 'Cyan', hex: '#0891b2' },
-  { name: 'Pink', hex: '#db2777' },
-  { name: 'Lime', hex: '#65a30d' },
+  { name: 'Rose',    hex: '#e11d48' },
+  { name: 'Amber',   hex: '#d97706' },
+  { name: 'Cyan',    hex: '#0891b2' },
+  { name: 'Pink',    hex: '#db2777' },
+  { name: 'Lime',    hex: '#65a30d' },
+  { name: 'Orange',  hex: '#ea580c' },
 ]

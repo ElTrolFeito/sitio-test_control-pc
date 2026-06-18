@@ -184,8 +184,8 @@ export default function ColorPicker({ color, onChange }) {
             <button
               key={preset.hex}
               onClick={() => handlePresetClick(preset.hex)}
-              className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-all ${color === preset.hex
-                  ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 ring-current'
+              className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-all ${color.toLowerCase() === preset.hex.toLowerCase()
+                  ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-800'
                   : 'hover:scale-105'
                 }`}
               style={{
