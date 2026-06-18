@@ -9,17 +9,23 @@ function getAuthHeaders() {
 }
 
 async function api(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: {
-      ...getAuthHeaders(),
-      ...(options.headers || {})
-    }
-  })
+  let res
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers: {
+        ...getAuthHeaders(),
+        ...(options.headers || {})
+      }
+    })
+  } catch (err) {
+    throw new Error('Network error: cannot connect to server')
+  }
 
   if (res.status === 401) {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    localStorage.removeItem('role')
     window.location.reload()
     return
   }
