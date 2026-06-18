@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 const AuthContext = createContext(null)
 
@@ -12,6 +12,12 @@ export function AuthProvider({ children }) {
     const saved = localStorage.getItem('role')
     return saved ? saved : null
   })
+
+  const logout = useCallback(() => {
+    setToken(null)
+    setUser(null)
+    setRole(null)
+  }, [])
 
   useEffect(() => {
     if (token) {
@@ -37,16 +43,18 @@ export function AuthProvider({ children }) {
     }
   }, [role])
 
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      logout()
+    }
+    window.addEventListener('auth-expired', handleAuthExpired)
+    return () => window.removeEventListener('auth-expired', handleAuthExpired)
+  }, [logout])
+
   const login = (newToken, newUser, newRole) => {
     setToken(newToken)
     setUser(newUser)
     setRole(newRole || 'USER')
-  }
-
-  const logout = () => {
-    setToken(null)
-    setUser(null)
-    setRole(null)
   }
 
   const isAdmin = role === 'ADMIN'

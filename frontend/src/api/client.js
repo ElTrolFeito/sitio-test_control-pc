@@ -23,11 +23,8 @@ async function api(path, options = {}) {
   }
 
   if (res.status === 401) {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    localStorage.removeItem('role')
-    window.location.reload()
-    return
+    window.dispatchEvent(new CustomEvent('auth-expired'))
+    throw new Error('Session expired')
   }
 
   if (!res.ok) {
