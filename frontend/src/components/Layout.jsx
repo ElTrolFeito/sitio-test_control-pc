@@ -1,12 +1,15 @@
+import { useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { useNavigate } from 'react-router-dom'
-import { Power, LogOut, Sun, Moon } from 'lucide-react'
+import { Power, LogOut, Palette } from 'lucide-react'
+import ThemeSettings from './ThemeSettings.jsx'
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
-  const { theme, toggleTheme } = useTheme()
+  const { theme, customThemeEnabled, primaryColor, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const [showThemeSettings, setShowThemeSettings] = useState(false)
 
   function handleLogout() {
     logout()
@@ -25,11 +28,21 @@ export default function Layout({ children }) {
             <div className="flex items-center gap-3">
               <span className="text-sm text-slate-600 dark:text-slate-400 hidden sm:inline">{user}</span>
               <button
-                onClick={toggleTheme}
-                className="inline-flex items-center justify-center w-9 h-9 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                title={theme === 'dark' ? 'Cambiar a claro' : 'Cambiar a oscuro'}
+                onClick={() => setShowThemeSettings(true)}
+                className={`inline-flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${customThemeEnabled
+                    ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/50'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                  }`}
+                title="Personalizar tema"
               >
-                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {customThemeEnabled ? (
+                  <div
+                    className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                    style={{ backgroundColor: primaryColor }}
+                  />
+                ) : (
+                  <Palette className="w-4 h-4" />
+                )}
               </button>
               <button
                 onClick={handleLogout}
@@ -45,6 +58,10 @@ export default function Layout({ children }) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
+
+      {showThemeSettings && (
+        <ThemeSettings onClose={() => setShowThemeSettings(false)} />
+      )}
     </div>
   )
 }

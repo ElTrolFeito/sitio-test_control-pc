@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { login } from '../api/client.js'
-import { Power, Eye, EyeOff, Sun, Moon } from 'lucide-react'
+import { Power, Eye, EyeOff, Palette } from 'lucide-react'
 import { toast } from 'sonner'
+import ThemeSettings from '../components/ThemeSettings.jsx'
 
 export default function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [showThemeSettings, setShowThemeSettings] = useState(false)
   const { login: doLogin } = useAuth()
-  const { theme, toggleTheme } = useTheme()
+  const { theme, customThemeEnabled, primaryColor, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
   async function handleSubmit(e) {
@@ -88,15 +90,35 @@ export default function Login() {
           </form>
         </div>
 
-        <div className="flex justify-center mt-6">
+        <div className="flex justify-center gap-3 mt-6">
           <button
             onClick={toggleTheme}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             {theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
           </button>
+          <button
+            onClick={() => setShowThemeSettings(true)}
+            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${customThemeEnabled
+                ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/50'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
+              }`}
+          >
+            {customThemeEnabled ? (
+              <div
+                className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                style={{ backgroundColor: primaryColor }}
+              />
+            ) : (
+              <Palette className="w-4 h-4" />
+            )}
+            Personalizar
+          </button>
         </div>
+
+        {showThemeSettings && (
+          <ThemeSettings onClose={() => setShowThemeSettings(false)} />
+        )}
       </div>
     </div>
   )
