@@ -38,6 +38,53 @@ function applyThemeStyles(themeMode, primaryColor, customEnabled) {
   document.head.appendChild(styleEl)
 }
 
+function playFlashbangSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const now = ctx.currentTime
+
+    // Explosion burst — short white noise with sharp decay
+    const bufLen = Math.floor(ctx.sampleRate * 0.18)
+    const noiseBuffer = ctx.createBuffer(2, bufLen, ctx.sampleRate)
+    for (let ch = 0; ch < 2; ch++) {
+      const data = noiseBuffer.getChannelData(ch)
+      for (let i = 0; i < bufLen; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / bufLen)
+      }
+    }
+    const noise = ctx.createBufferSource()
+    noise.buffer = noiseBuffer
+
+    const noiseGain = ctx.createGain()
+    noiseGain.gain.setValueAtTime(2.5, now)
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18)
+
+    noise.connect(noiseGain)
+    noiseGain.connect(ctx.destination)
+    noise.start(now)
+
+    // High-frequency ringing ("tinnitus") that slowly fades
+    const ring = ctx.createOscillator()
+    ring.type = 'sine'
+    ring.frequency.setValueAtTime(4200, now + 0.05)
+    ring.frequency.exponentialRampToValueAtTime(800, now + 2.2)
+
+    const ringGain = ctx.createGain()
+    ringGain.gain.setValueAtTime(0.0, now)
+    ringGain.gain.linearRampToValueAtTime(0.35, now + 0.06)
+    ringGain.gain.exponentialRampToValueAtTime(0.001, now + 2.2)
+
+    ring.connect(ringGain)
+    ringGain.connect(ctx.destination)
+    ring.start(now + 0.04)
+    ring.stop(now + 2.2)
+
+    setTimeout(() => ctx.close(), 2500)
+  } catch (_) {
+    // Web Audio not available — skip silently
+  }
+}
+
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme')
@@ -57,10 +104,11 @@ export function ThemeProvider({ children }) {
     return localStorage.getItem('rainbowMode') === 'true'
   })
 
+  const [flashActive, setFlashActive] = useState(false)
+
   const rainbowRef = useRef(null)
   const rainbowHueRef = useRef(0)
 
-  // Stop any running rainbow animation
   const stopRainbow = useCallback(() => {
     if (rainbowRef.current) {
       clearInterval(rainbowRef.current)
@@ -68,7 +116,6 @@ export function ThemeProvider({ children }) {
     }
   }, [])
 
-  // Start rainbow animation — cycles hue at ~20fps
   const startRainbow = useCallback((currentTheme, currentCustom) => {
     stopRainbow()
     rainbowRef.current = setInterval(() => {
@@ -77,12 +124,10 @@ export function ThemeProvider({ children }) {
       const [r, g, b] = hslToRgb(h, 90, 50)
       const hex = rgbToHex(r, g, b)
       setPrimaryColor(hex)
-      // Directly apply styles without going through the effect cycle for smooth animation
       applyThemeStyles(currentTheme, hex, true)
     }, 50)
   }, [stopRainbow])
 
-  // Apply theme whenever mode, color, or custom-enabled changes
   useEffect(() => {
     if (!rainbowMode) {
       applyThemeStyles(theme, primaryColor, customThemeEnabled)
@@ -90,7 +135,6 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('theme', theme)
   }, [theme, primaryColor, customThemeEnabled, rainbowMode])
 
-  // Manage rainbow lifecycle
   useEffect(() => {
     localStorage.setItem('rainbowMode', rainbowMode ? 'true' : 'false')
     if (rainbowMode) {
@@ -102,7 +146,6 @@ export function ThemeProvider({ children }) {
     return () => stopRainbow()
   }, [rainbowMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // When theme mode changes while rainbow is running, restart so the closure has the new mode
   useEffect(() => {
     if (rainbowMode) {
       startRainbow(theme, customThemeEnabled)
@@ -122,6 +165,10 @@ export function ThemeProvider({ children }) {
   }
 
   function setThemeMode(mode) {
+    if (mode === 'light' && theme !== 'light') {
+      playFlashbangSound()
+      setFlashActive(true)
+    }
     setTheme(mode)
   }
 
@@ -156,6 +203,21 @@ export function ThemeProvider({ children }) {
       enableRainbow
     }}>
       {children}
+
+      {/* Flashbang overlay — rendered on top of everything */}
+      {flashActive && (
+        <div
+          onAnimationEnd={() => setFlashActive(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 999999,
+            backgroundColor: 'white',
+            pointerEvents: 'none',
+            animation: 'flashbang 1s ease-out forwards'
+          }}
+        />
+      )}
     </ThemeContext.Provider>
   )
 }
