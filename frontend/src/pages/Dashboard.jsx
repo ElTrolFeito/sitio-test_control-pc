@@ -43,8 +43,9 @@ export default function Dashboard() {
       return
     }
     try {
-      const result = await registerDevice(deviceForm)
-      setDevices(prev => [...prev, result])
+      await registerDevice(deviceForm)
+      // Reload full device list so the PC dropdown has proper id/name fields
+      await loadData()
       toast.success('Dispositivo registrado')
       setDeviceForm({ name: '', serial: '' })
       setShowDeviceForm(false)

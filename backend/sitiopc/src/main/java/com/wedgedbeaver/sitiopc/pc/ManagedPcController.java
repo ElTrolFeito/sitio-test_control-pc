@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.wedgedbeaver.sitiopc.device.Device;
 import com.wedgedbeaver.sitiopc.device.DeviceRepository;
@@ -35,6 +36,7 @@ public class ManagedPcController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<ManagedPc>> listPcs() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -52,28 +54,23 @@ public class ManagedPcController {
     }
 
     @PostMapping(consumes = "application/json")
+    @Transactional
     public ResponseEntity<ManagedPc> createPc(
             @RequestBody CreatePcRequest request) {
-
-        Device existingDevice = deviceRepository.findById(request.getDeviceId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "El dispositivo no existe"));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED,
-                        "Usuario no encontrado"));
+                        HttpStatus.UNAUTHORIZED, "Usuario no encontrado"));
 
-        if (existingDevice.getUser() == null ||
-                !existingDevice.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "No tienes permisos para utilizar este dispositivo");
-        }
+        // findByIdAndUser combines existence check + ownership in one query,
+        // avoiding any lazy-load issues with the device→user association.
+        Device existingDevice = deviceRepository.findByIdAndUser(request.getDeviceId(), user)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "No tienes permisos para utilizar este dispositivo"));
 
         ManagedPc pc = new ManagedPc();
         pc.setId(UUID.randomUUID());

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.wedgedbeaver.sitiopc.user.User;
 import com.wedgedbeaver.sitiopc.user.UserRepository;
@@ -29,6 +30,7 @@ public class DeviceController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public List<Device> getDevices() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
@@ -38,6 +40,7 @@ public class DeviceController {
     }
 
     @PostMapping("/register")
+    @Transactional
     public ResponseEntity<?> register(
             @RequestBody RegisterDeviceRequest request
     ) {
@@ -49,9 +52,7 @@ public class DeviceController {
             return ResponseEntity.ok(
                     service.register(request, user)
             );
-
         } catch (RuntimeException ex) {
-
             return ResponseEntity.badRequest()
                     .body(ex.getMessage());
         }
