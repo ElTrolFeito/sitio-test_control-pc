@@ -39,6 +39,13 @@ html.dark textarea {
   --primary-900: #1e3a8a;
 }
 
+/* Flashbang animation — triggered when switching to Light Mode */
+@keyframes flashbang {
+  0%   { opacity: 1; }
+  15%  { opacity: 1; }   /* hold the blindness */
+  100% { opacity: 0; }
+}
+
 /* Range input styling for color picker */
 input[type="range"] {
   -webkit-appearance: none;
