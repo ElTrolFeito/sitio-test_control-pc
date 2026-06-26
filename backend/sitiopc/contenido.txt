@@ -242,6 +242,7 @@ BOOT-INF/lib/micrometer-commons-1.17.0.jar
 BOOT-INF/lib/spring-boot-webmvc-4.1.0.jar
 BOOT-INF/lib/spring-boot-servlet-4.1.0.jar
 BOOT-INF/lib/spring-webmvc-7.0.8.jar
+BOOT-INF/lib/flyway-database-postgresql-12.4.0.jar
 BOOT-INF/lib/flyway-core-12.4.0.jar
 BOOT-INF/lib/jackson-databind-3.1.4.jar
 BOOT-INF/lib/jackson-core-3.1.4.jar

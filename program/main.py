@@ -104,7 +104,7 @@ def main():
     args = parser.parse_args()
 
     cfg = load_or_create_config()
-    base_url = args.server or cfg.get("base_url", "http://localhost:8081")
+    base_url = args.server or cfg.get("base_url", "https://sitiopc-pablo.up.railway.app/")
     api = ApiClient(base_url=base_url)
 
     if args.setup:
