@@ -9,7 +9,7 @@ WorkingDirectory=/home/pi/sitiopc-agent
 ExecStart=/usr/bin/python3 /home/pi/sitiopc-agent/main.py
 Restart=always
 RestartSec=5
-Environment="SITIOPC_SERVER=https://sitiopc-pablo.up.railway.app/"
+Environment="SITIOPC_SERVER=https://backend-sitiopc-pablo.up.railway.app"
 Environment="SITIOPC_POLL_INTERVAL=10"
 
 [Install]

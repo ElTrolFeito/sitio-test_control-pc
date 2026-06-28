@@ -10,7 +10,7 @@ def ensure_config_dir():
 
 
 def get_default_server_url():
-    return os.environ.get("SITIOPC_SERVER", "https://sitiopc-pablo.up.railway.app/")
+    return os.environ.get("SITIOPC_SERVER", "https://backend-sitiopc-pablo.up.railway.app")
 
 
 def get_poll_interval():
